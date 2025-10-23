@@ -1,0 +1,209 @@
+@startuml StudySync Database Schema
+
+' Styling
+skinparam backgroundColor #EEEBDC
+skinparam handwritten false
+skinparam class {
+    BackgroundColor #F5F5F5
+    ArrowColor #2688d4
+    BorderColor #2688d4
+}
+
+' Users entity
+entity "users" as users {
+    * email: VARCHAR(100) <<PK>>
+    --
+    * password: VARCHAR(255)
+    * role: VARCHAR(10)
+    first_name: VARCHAR(50)
+    last_name: VARCHAR(50)
+    profile_picture: BLOB
+    last_login: TIMESTAMP
+    * created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+    status: VARCHAR(20)
+    preferences: JSON
+    account_type: VARCHAR(20)
+}
+
+' Tasks entity
+entity "tasks" as tasks {
+    * id: INT <<PK>>
+    --
+    * title: VARCHAR(100)
+    * description: TEXT
+    * status: VARCHAR(20)
+    * priority: VARCHAR(20)
+    * created_by: VARCHAR(100) <<FK>>
+    * assigned_to: VARCHAR(100) <<FK>>
+    parent_task_id: INT <<FK>>
+    category_id: INT <<FK>>
+    estimated_hours: DECIMAL(5,2)
+    actual_hours: DECIMAL(5,2)
+    progress: INT
+    due_date: DATE
+    start_date: DATE
+    * created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+    completed_at: TIMESTAMP
+    reminder_date: TIMESTAMP
+    recurrence_pattern: VARCHAR(50)
+    tags: VARCHAR(255)
+}
+
+' Categories entity
+entity "categories" as categories {
+    * id: INT <<PK>>
+    --
+    * name: VARCHAR(50)
+    description: TEXT
+    color: VARCHAR(7)
+    icon: VARCHAR(50)
+    parent_id: INT <<FK>>
+    * created_by: VARCHAR(100) <<FK>>
+    * created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+' Comments entity
+entity "comments" as comments {
+    * id: INT <<PK>>
+    --
+    * task_id: INT <<FK>>
+    * user_email: VARCHAR(100) <<FK>>
+    * content: TEXT
+    attachment_url: VARCHAR(255)
+    * created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+    parent_comment_id: INT <<FK>>
+}
+
+' Attachments entity
+entity "attachments" as attachments {
+    * id: INT <<PK>>
+    --
+    * task_id: INT <<FK>>
+    * user_email: VARCHAR(100) <<FK>>
+    * file_name: VARCHAR(255)
+    * file_path: VARCHAR(255)
+    file_size: BIGINT
+    file_type: VARCHAR(50)
+    * created_at: TIMESTAMP
+    description: TEXT
+}
+
+' Task History entity
+entity "task_history" as history {
+    * id: INT <<PK>>
+    --
+    * task_id: INT <<FK>>
+    * user_email: VARCHAR(100) <<FK>>
+    * action: VARCHAR(50)
+    * changes: JSON
+    * created_at: TIMESTAMP
+    comments: TEXT
+}
+
+' Notifications entity
+entity "notifications" as notifications {
+    * id: INT <<PK>>
+    --
+    * user_email: VARCHAR(100) <<FK>>
+    * type: VARCHAR(50)
+    * content: TEXT
+    * status: VARCHAR(20)
+    reference_id: INT
+    reference_type: VARCHAR(50)
+    * created_at: TIMESTAMP
+    read_at: TIMESTAMP
+}
+
+' User Settings entity
+entity "user_settings" as settings {
+    * user_email: VARCHAR(100) <<PK>>
+    --
+    notification_preferences: JSON
+    theme_preferences: JSON
+    calendar_settings: JSON
+    language: VARCHAR(10)
+    timezone: VARCHAR(50)
+    * created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+' Tags entity
+entity "tags" as tags {
+    * id: INT <<PK>>
+    --
+    * name: VARCHAR(50)
+    color: VARCHAR(7)
+    * created_by: VARCHAR(100) <<FK>>
+    * created_at: TIMESTAMP
+}
+
+' Task Tags relation
+entity "task_tags" as task_tags {
+    * task_id: INT <<PK, FK>>
+    * tag_id: INT <<PK, FK>>
+    --
+    * created_at: TIMESTAMP
+}
+
+' Relationships
+users ||--o{ tasks : "creates"
+users ||--o{ tasks : "assigned to"
+users ||--o{ comments : "creates"
+users ||--o{ attachments : "uploads"
+users ||--|| settings : "has"
+users ||--o{ notifications : "receives"
+users ||--o{ history : "generates"
+users ||--o{ categories : "creates"
+users ||--o{ tags : "creates"
+
+tasks ||--o{ comments : "has"
+tasks ||--o{ attachments : "contains"
+tasks ||--o{ history : "tracks"
+tasks ||--o{ task_tags : "has"
+tasks }o--|| categories : "belongs to"
+tasks ||--o{ tasks : "parent of"
+
+categories ||--o{ categories : "parent of"
+
+comments ||--o{ comments : "parent of"
+
+tags ||--o{ task_tags : "used in"
+
+' Notes
+note bottom of users
+  Role can be either:
+  - teacher
+  - student
+
+  Status can be:
+  - active
+  - inactive
+  - suspended
+end note
+
+note bottom of tasks
+  Status can be:
+  - pending
+  - in_progress
+  - completed
+  - cancelled
+  - deferred
+
+  Priority can be:
+  - HIGH
+  - MEDIUM
+  - LOW
+end note
+
+note bottom of notifications
+  Status can be:
+  - unread
+  - read
+  - archived
+end note
+
+@enduml

@@ -1,0 +1,131 @@
+@startuml StudySync Core Classes
+
+' Styling for minimalism
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype ortho
+
+' Class Styling
+skinparam class {
+    BackgroundColor white
+    BorderColor black
+    ArrowColor black
+}
+
+' Main Classes
+class Dashboard {
+    - userEmail: String
+    - userRole: String
+    + Dashboard(email: String, role: String)
+    + showTaskManager(): void
+    + showScheduleManager(): void
+}
+
+class TaskManager {
+    - taskTable: JTable
+    - currentUserEmail: String
+    - userRole: String
+    + TaskManager(email: String, role: String)
+    + refreshTaskList(): void
+    + showTaskDialog(taskId: Integer): void
+    + deleteTask(taskId: int): void
+    + markTaskComplete(taskId: int): void
+}
+
+class ScheduleManager {
+    - calendarPanel: JPanel
+    - currentCalendar: Calendar
+    - tasksMap: Map<String, List<Task>>
+    + ScheduleManager(email: String, role: String)
+    + loadTasks(): void
+    + refreshCalendar(): void
+    + showTasksDialog(dateKey: String): void
+}
+
+class Task {
+    - id: Integer
+    - title: String
+    - description: String
+    - status: String
+    - priority: String
+    - createdBy: String
+    - assignedTo: String
+    - dueDate: Date
+    + Task(title: String, description: String)
+    + getStatus(): String
+    + updateStatus(status: String): void
+}
+
+class UserAuth {
+    - currentUserEmail: String
+    - currentUserRole: String
+    + login(email: String, password: String): boolean
+    + register(email: String, password: String, role: String): boolean
+    + getCurrentUserEmail(): String
+    + getCurrentUserRole(): String
+}
+
+class DBConnection {
+    - {static} connection: Connection
+    + {static} getConnection(): Connection
+    - {static} createConnection(): Connection
+}
+
+' Enums
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum UserRole {
+    TEACHER
+    STUDENT
+}
+
+' Relationships
+Dashboard --> TaskManager : creates
+Dashboard --> ScheduleManager : creates
+Dashboard --> UserAuth : uses
+
+TaskManager --> Task : manages
+TaskManager --> DBConnection : uses
+ScheduleManager --> Task : displays
+ScheduleManager --> DBConnection : uses
+
+Task --> TaskStatus : has
+Task --> Priority : has
+
+UserAuth --> DBConnection : uses
+UserAuth --> UserRole : verifies
+
+' Notes
+note right of TaskManager
+  Manages CRUD operations for tasks
+  with role-based access control
+end note
+
+note right of ScheduleManager
+  Provides calendar-based view
+  of tasks with due dates
+end note
+
+note right of Task
+  Core entity representing academic
+  tasks with status and priority
+end note
+
+note right of UserAuth
+  Handles authentication and
+  role-based authorization
+end note
+
+@enduml

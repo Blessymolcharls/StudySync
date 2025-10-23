@@ -1,0 +1,111 @@
+@startuml StudySync Minimalist Architecture
+
+' Styling
+skinparam backgroundColor white
+skinparam style strictuml
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+
+skinparam component {
+    BackgroundColor white
+    BorderColor #333333
+    ArrowColor #666666
+}
+
+skinparam package {
+    BackgroundColor white
+    BorderColor #333333
+}
+
+skinparam interface {
+    BackgroundColor white
+    BorderColor #333333
+}
+
+' Title
+title StudySync - Minimal Architecture
+
+' Main Packages
+package "Presentation" {
+    [GUI Components] as gui
+    [View Controllers] as controllers
+}
+
+package "Application" {
+    [Task Service] as taskService
+    [User Service] as userService
+    [Schedule Service] as scheduleService
+}
+
+package "Domain" {
+    [Task] as task
+    [User] as user
+    [Schedule] as schedule
+}
+
+package "Infrastructure" {
+    [Database] as db
+    [File Storage] as files
+}
+
+package "Common" {
+    [Security] as security
+    [Logging] as logging
+}
+
+' Main Interfaces
+interface "UI" as ui
+interface "Services" as services
+interface "Data Access" as data
+
+' Key Relationships
+ui - [GUI Components]
+[GUI Components] --> [View Controllers]
+[View Controllers] --> services
+
+services - [Task Service]
+services - [User Service]
+services - [Schedule Service]
+
+[Task Service] --> [Task]
+[User Service] --> [User]
+[Schedule Service] --> [Schedule]
+
+[Task] --> data
+[User] --> data
+[Schedule] --> data
+
+data - [Database]
+data - [File Storage]
+
+' Cross-cutting concerns
+[Security] ...> Presentation
+[Security] ...> Application
+[Security] ...> Infrastructure
+
+[Logging] ...> Presentation
+[Logging] ...> Application
+[Logging] ...> Infrastructure
+
+' Notes
+note left of Presentation
+  User Interface and
+  Event Handling
+end note
+
+note right of Application
+  Business Logic and
+  Service Layer
+end note
+
+note right of Infrastructure
+  Data Storage and
+  External Systems
+end note
+
+note right of Common
+  Cross-cutting
+  Concerns
+end note
+
+@enduml

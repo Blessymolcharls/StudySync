@@ -1,0 +1,510 @@
+@startuml StudySync Architecture
+
+' Styling
+skinparam backgroundColor #EEEBDC
+skinparam component {
+    BackgroundColor #F5F5F5
+    BorderColor #2688d4
+    ArrowColor #2688d4
+}
+skinparam database {
+    BackgroundColor #F8F8F8
+    BorderColor #2688d4
+}
+skinparam rectangle {
+    BackgroundColor #F5F5F5
+    BorderColor #2688d4
+}
+skinparam interface {
+    BackgroundColor #F5F5F5
+    BorderColor #2688d4
+}
+skinparam node {
+    BackgroundColor #F5F5F5
+    BorderColor #2688d4
+}
+skinparam cloud {
+    BackgroundColor #F8F8F8
+    BorderColor #2688d4
+}
+
+' Title
+title StudySync - System Architecture
+
+' Layers
+package "Presentation Layer" {
+    rectangle "GUI Components" {
+        package "Main Windows" {
+            [Dashboard]
+            [Login Window]
+            [Registration Window]
+        }
+        
+        package "Task Management" {
+            [TaskManager GUI]
+            [Task Creation Dialog]
+            [Task Edit Dialog]
+            [Task Filter Panel]
+            [Task Search Panel]
+        }
+        
+        package "Schedule Views" {
+            [ScheduleManager GUI]
+            [Calendar View]
+            [Task Timeline]
+            [Due Date Reminders]
+        }
+        
+        package "Common Components" {
+            [Notification Panel]
+            [Status Bar]
+            [Progress Indicators]
+            [Alert Dialogs]
+        }
+    }
+    
+    rectangle "UI Controllers" {
+        package "Event Management" {
+            [Event Handlers]
+            [Event Bus]
+            [Event Dispatchers]
+        }
+        
+        package "Input Processing" {
+            [Input Validators]
+            [Form Controllers]
+            [Data Binders]
+        }
+        
+        package "State Management" {
+            [UI State Manager]
+            [Session Manager]
+            [View Controllers]
+        }
+        
+        package "UI Services" {
+            [Dialog Service]
+            [Navigation Service]
+            [Theme Service]
+        }
+    }
+}
+
+package "Business Logic Layer" {
+    rectangle "Core Services" {
+        package "Task Management" {
+            [Task Service]
+            [Assignment Service]
+            [Priority Service]
+            [Status Service]
+        }
+        
+        package "User Management" {
+            [User Service]
+            [Role Service]
+            [Profile Service]
+            [Permission Service]
+        }
+        
+        package "Schedule Management" {
+            [Schedule Service]
+            [Calendar Service]
+            [Reminder Service]
+            [Timeline Service]
+        }
+        
+        package "Support Services" {
+            [Notification Service]
+            [File Service]
+            [Search Service]
+            [Report Service]
+        }
+    }
+    
+    rectangle "Domain Models" {
+        package "Core Entities" {
+            [Task]
+            [User]
+            [Schedule]
+            [Category]
+        }
+        
+        package "Support Entities" {
+            [Notification]
+            [Attachment]
+            [Comment]
+            [Tag]
+        }
+        
+        package "Value Objects" {
+            [TaskStatus]
+            [Priority]
+            [Role]
+            [Permission]
+        }
+        
+        package "DTOs" {
+            [TaskDTO]
+            [UserDTO]
+            [ScheduleDTO]
+            [ReportDTO]
+        }
+    }
+    
+    rectangle "Business Rules" {
+        package "Validation Rules" {
+            [Task Validation]
+            [User Validation]
+            [Schedule Validation]
+            [Data Validation]
+        }
+        
+        package "Security Rules" {
+            [Access Control]
+            [Role Management]
+            [Permission Control]
+            [Data Privacy]
+        }
+        
+        package "Business Policies" {
+            [Task Policies]
+            [Schedule Policies]
+            [User Policies]
+        }
+        
+        package "Workflow Rules" {
+            [Task Workflow]
+            [Approval Workflow]
+            [Notification Rules]
+        }
+    }
+    
+    rectangle "Business Facades" {
+        [Task Facade]
+        [User Facade]
+        [Schedule Facade]
+        [Report Facade]
+    }
+}
+
+package "Data Access Layer" {
+    rectangle "Data Access Objects" {
+        package "Core DAOs" {
+            [TaskDAO]
+            [UserDAO]
+            [ScheduleDAO]
+            [CategoryDAO]
+        }
+        
+        package "Support DAOs" {
+            [NotificationDAO]
+            [AttachmentDAO]
+            [CommentDAO]
+            [TagDAO]
+        }
+        
+        package "Report DAOs" {
+            [TaskReportDAO]
+            [UserReportDAO]
+            [ActivityReportDAO]
+        }
+    }
+    
+    rectangle "Database Operations" {
+        package "Connection Management" {
+            [Connection Pool]
+            [Connection Manager]
+            [Session Factory]
+        }
+        
+        package "Query Management" {
+            [Query Builder]
+            [Query Executor]
+            [Result Mapper]
+        }
+        
+        package "Transaction Management" {
+            [Transaction Manager]
+            [Unit of Work]
+            [Change Tracker]
+        }
+    }
+    
+    rectangle "Data Mapping" {
+        package "ORM Mapping" {
+            [Entity Mapper]
+            [Relationship Mapper]
+            [Cache Manager]
+        }
+        
+        package "Type Conversion" {
+            [Type Converter]
+            [Data Transformer]
+            [Format Handler]
+        }
+    }
+    
+    rectangle "Repository Layer" {
+        package "Core Repositories" {
+            [Task Repository]
+            [User Repository]
+            [Schedule Repository]
+        }
+        
+        package "Generic Repository" {
+            [Base Repository]
+            [Query Specification]
+            [Filter Builder]
+        }
+    }
+}
+
+package "Infrastructure Layer" {
+    package "Database Systems" {
+        database "MariaDB Primary" {
+            folder "Core Schema" {
+                [Users Table]
+                [Tasks Table]
+                [Categories Table]
+                [Schedules Table]
+            }
+            
+            folder "Support Schema" {
+                [Notifications Table]
+                [Attachments Table]
+                [Comments Table]
+                [Tags Table]
+            }
+            
+            folder "Audit Schema" {
+                [Task History]
+                [User Activity]
+                [System Logs]
+            }
+        }
+        
+        database "File Storage" {
+            folder "User Content" {
+                [Profile Pictures]
+                [Task Attachments]
+                [Report Files]
+            }
+            
+            folder "System Files" {
+                [Log Files]
+                [Temp Files]
+                [Cache Files]
+            }
+            
+            folder "Backup Storage" {
+                [Database Backups]
+                [File Backups]
+                [Config Backups]
+            }
+        }
+    }
+    
+    package "Integration Services" {
+        rectangle "External Services" {
+            [Email Service]
+            [Calendar Integration]
+            [Storage Service]
+        }
+        
+        rectangle "Authentication Providers" {
+            [Local Auth]
+            [LDAP]
+            [OAuth]
+        }
+        
+        rectangle "Monitoring Services" {
+            [Performance Monitor]
+            [Health Check]
+            [Alert System]
+        }
+    }
+    
+    package "Background Services" {
+        rectangle "Job Processors" {
+            [Task Scheduler]
+            [Queue Worker]
+            [Batch Processor]
+        }
+        
+        rectangle "System Services" {
+            [Backup Service]
+            [Cleanup Service]
+            [Index Service]
+        }
+    }
+}
+
+package "Cross-Cutting Concerns" {
+    rectangle "Security Framework" {
+        package "Authentication" {
+            [Authentication Manager]
+            [Token Service]
+            [Session Manager]
+        }
+        
+        package "Authorization" {
+            [Permission Manager]
+            [Role Manager]
+            [Access Controller]
+        }
+        
+        package "Cryptography" {
+            [Password Hasher]
+            [Encryption Service]
+            [Key Manager]
+        }
+    }
+    
+    rectangle "Logging Framework" {
+        package "System Logging" {
+            [System Logger]
+            [Performance Logger]
+            [Security Logger]
+        }
+        
+        package "Audit Logging" {
+            [User Activity Logger]
+            [Data Change Logger]
+            [Access Logger]
+        }
+        
+        package "Error Logging" {
+            [Error Logger]
+            [Debug Logger]
+            [Crash Reporter]
+        }
+    }
+    
+    rectangle "Error Handling Framework" {
+        package "Exception Management" {
+            [Exception Handler]
+            [Error Translator]
+            [Recovery Manager]
+        }
+        
+        package "Error Reporting" {
+            [Error Reporter]
+            [Alert Manager]
+            [Notification Sender]
+        }
+        
+        package "Validation Framework" {
+            [Input Validator]
+            [Data Validator]
+            [Schema Validator]
+        }
+    }
+    
+    rectangle "Common Services" {
+        package "Configuration" {
+            [Config Manager]
+            [Environment Manager]
+            [Feature Flags]
+        }
+        
+        package "Caching" {
+            [Cache Manager]
+            [Cache Provider]
+            [Cache Policy]
+        }
+        
+        package "Utilities" {
+            [String Utils]
+            [Date Utils]
+            [File Utils]
+        }
+    }
+}
+
+' Interfaces
+interface "User Interface" as UI
+interface "Business Logic Interface" as BLI
+interface "Data Access Interface" as DAI
+interface "Database Interface" as DBI
+
+' Relationships
+UI - [GUI Components]
+[GUI Components] --> [UI Controllers]
+[UI Controllers] --> BLI
+
+BLI - [Core Services]
+[Core Services] --> [Domain Models]
+[Core Services] --> [Business Rules]
+[Core Services] --> DAI
+
+DAI - [Data Access Objects]
+[Data Access Objects] --> [Database Connection]
+[Database Connection] --> DBI
+
+DBI - [MariaDB]
+
+' Cross-cutting relationships
+[Cross-Cutting Concerns] ..> [Presentation Layer] : supports
+[Cross-Cutting Concerns] ..> [Business Logic Layer] : supports
+[Cross-Cutting Concerns] ..> [Data Access Layer] : supports
+
+' Notes
+note "Presentation Layer" as N1
+  Responsible for:
+  * User interface components
+  * Event handling
+  * Input validation
+  * UI state management
+  * User interaction
+  * View rendering
+end note
+
+note "Business Logic Layer" as N2
+  Responsible for:
+  * Core business logic
+  * Domain rules
+  * Validation rules
+  * Service orchestration
+  * Business workflows
+  * Data transformation
+end note
+
+note "Data Access Layer" as N3
+  Responsible for:
+  * Database operations
+  * Data mapping
+  * Transaction management
+  * Query execution
+  * Cache management
+  * Data persistence
+end note
+
+note "Infrastructure Layer" as N4
+  Responsible for:
+  * External systems integration
+  * File storage management
+  * Background processing
+  * System services
+  * External communications
+end note
+
+note "Cross-Cutting Concerns" as N5
+  Provides:
+  * Security services
+  * Logging & monitoring
+  * Error handling
+  * Configuration
+  * Common utilities
+  * Caching services
+end note
+
+' Legend
+legend right
+  |= Component Type |= Description |
+  |<#F5F5F5> Rectangle | Logical grouping |
+  |<#F8F8F8> Database | Data storage |
+  |<#2688d4> Arrow | Data flow |
+  |<#2688d4> Line | Interface |
+endlegend
+
+@enduml

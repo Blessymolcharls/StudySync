@@ -1,0 +1,155 @@
+@startuml StudySync Class Diagram
+
+' Styling
+skinparam backgroundColor white
+skinparam style strictuml
+skinparam defaultFontName Arial
+skinparam linetype ortho
+
+skinparam class {
+    BackgroundColor white
+    BorderColor #333333
+    ArrowColor #666666
+}
+
+' Title
+title StudySync - Core Class Diagram
+
+' Database Connection
+class DBConnection {
+    - {static} connection: Connection
+    + {static} getConnection(): Connection
+    - {static} createConnection(): Connection
+}
+
+' User Classes
+class User {
+    - email: String
+    - password: String
+    - role: UserRole
+    - firstName: String
+    - lastName: String
+    + User(email: String, password: String)
+    + getRole(): UserRole
+    + getFullName(): String
+    + validatePassword(password: String): boolean
+}
+
+enum UserRole {
+    TEACHER
+    STUDENT
+}
+
+class UserAuth {
+    - currentUser: User
+    + login(email: String, password: String): boolean
+    + register(user: User): boolean
+    + isTeacher(): boolean
+    + getCurrentUser(): User
+}
+
+' Task Classes
+class Task {
+    - id: Integer
+    - title: String
+    - description: String
+    - status: TaskStatus
+    - priority: Priority
+    - createdBy: User
+    - assignedTo: User
+    - dueDate: Date
+    + Task(title: String, description: String)
+    + updateStatus(status: TaskStatus): void
+    + setPriority(priority: Priority): void
+    + assignTo(user: User): void
+}
+
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+' Manager Classes
+class TaskManager {
+    - taskTable: JTable
+    - currentUser: User
+    + refreshTaskList(): void
+    + showTaskDialog(taskId: Integer): void
+    + createTask(task: Task): void
+    + updateTask(task: Task): void
+    + deleteTask(taskId: Integer): void
+}
+
+class ScheduleManager {
+    - calendarPanel: JPanel
+    - currentDate: Date
+    - taskMap: Map<Date, List<Task>>
+    + refreshCalendar(): void
+    + showTasksForDate(date: Date): void
+    + addTask(task: Task): void
+    + updateTask(task: Task): void
+}
+
+class Dashboard {
+    - userEmail: String
+    - userRole: UserRole
+    - taskManager: TaskManager
+    - scheduleManager: ScheduleManager
+    + Dashboard(user: User)
+    + initialize(): void
+    + refreshView(): void
+}
+
+' Relationships
+User "1" *-- "1" UserRole
+Task "1" *-- "1" TaskStatus
+Task "1" *-- "1" Priority
+
+User "1" -- "*" Task : creates >
+User "1" -- "*" Task : assigned to >
+
+Dashboard "1" *-- "1" TaskManager
+Dashboard "1" *-- "1" ScheduleManager
+
+TaskManager --> Task : manages >
+ScheduleManager --> Task : displays >
+
+UserAuth --> User : authenticates >
+
+DBConnection <-- TaskManager : uses
+DBConnection <-- ScheduleManager : uses
+DBConnection <-- UserAuth : uses
+
+' Notes
+note right of User
+  Core entity representing
+  system users with role-based
+  access control
+end note
+
+note right of Task
+  Represents academic tasks
+  with status tracking and
+  priority management
+end note
+
+note right of TaskManager
+  Handles CRUD operations
+  for tasks with role-based
+  permissions
+end note
+
+note right of ScheduleManager
+  Provides calendar view
+  of tasks with visual
+  organization
+end note
+
+@enduml
