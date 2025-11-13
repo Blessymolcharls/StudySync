@@ -143,24 +143,31 @@ public class ScheduleManager extends JPanel {
         tasksMap.clear();
         try (Connection conn = DBConnection.getConnection()) {
             // Build query based on user role
-            StringBuilder sql = new StringBuilder("SELECT * FROM tasks WHERE 1=1 ");
-            
+            StringBuilder sql = new StringBuilder(
+                "SELECT t.*, b.branch_name " +
+                "FROM tasks t " +
+                "LEFT JOIN branches b ON t.branch_code = b.branch_code " +
+                "WHERE 1=1 ");
+
             if (currentUserRole.equals("teacher")) {
-                // Teachers only see tasks they created
+                // Teachers see tasks they created
                 sql.append("AND created_by = ? ");
             } else {
-                // Students see tasks they created and tasks assigned to them
-                sql.append("AND (created_by = ? OR assigned_to = ?) ");
+                // Students see tasks for their branch and semester
+                sql.append("AND (created_by = ? OR (t.semester = " +
+                         "(SELECT current_semester FROM users WHERE email = ?) " +
+                         "AND t.branch_code = (SELECT branch_code FROM users WHERE email = ?))) ");
             }
             
             PreparedStatement stmt = conn.prepareStatement(sql.toString());
             
-            // Set parameters based on role
+            int paramIndex = 1;
             if (currentUserRole.equals("teacher")) {
-                stmt.setString(1, currentUserEmail);
+                stmt.setString(paramIndex++, currentUserEmail);
             } else {
-                stmt.setString(1, currentUserEmail);
-                stmt.setString(2, currentUserEmail);
+                stmt.setString(paramIndex++, currentUserEmail); // for created_by
+                stmt.setString(paramIndex++, currentUserEmail); // for semester check
+                stmt.setString(paramIndex++, currentUserEmail); // for branch check
             }
             ResultSet rs = stmt.executeQuery();
 
@@ -189,11 +196,11 @@ public class ScheduleManager extends JPanel {
                 // Role-based visibility
                 boolean shouldShow = false;
                 if (currentUserRole.equals("teacher")) {
-                    // Teachers only see tasks they created
+                    // Teachers see tasks they created
                     shouldShow = createdBy.equals(currentUserEmail);
                 } else if (currentUserRole.equals("student")) {
-                    // Students see tasks they created and tasks assigned to them
-                    shouldShow = createdBy.equals(currentUserEmail);
+                    // Students see tasks they created AND tasks assigned to their branch/semester
+                    shouldShow = true; // We've already filtered by branch/semester in SQL query
                 }
                 
                 if (shouldShow && !key.isEmpty()) {
